@@ -25,7 +25,7 @@
         <div class="content">
             <div class="container-fluid">
                 <div class="card card-primary card-outline">
-                    <div class="card-header">
+                    <div class="card-header d-flex align-items-center justify-content-between">
                         <form action="{{ route('export') }}" method="GET" class="form-inline">
                             @csrf
                             <div class="form-group mx-sm-3 mb-2">
@@ -42,26 +42,30 @@
                         </form>
 
                         <!-- Sorting Form -->
-                        <form method="GET" action="{{ route('view-data.index') }}" class="mt-3">
-                            <label for="sort">Sort by:</label>
-                            <select name="sort" id="sort" class="form-control d-inline-block w-auto">
-                                <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>Created At</option>
-                                <option value="datetime" {{ request('sort') == 'datetime' ? 'selected' : '' }}>Date Time</option>
-                                <option value="pH" {{ request('sort') == 'pH' ? 'selected' : '' }}>pH</option>
-                                <option value="cod" {{ request('sort') == 'cod' ? 'selected' : '' }}>COD</option>
-                                <option value="tss" {{ request('sort') == 'tss' ? 'selected' : '' }}>TSS</option>
-                                <option value="nh3n" {{ request('sort') == 'nh3n' ? 'selected' : '' }}>NH3N</option>
-                                <option value="debit" {{ request('sort') == 'debit' ? 'selected' : '' }}>Debit</option>
-                            </select>
+                        <form method="GET" action="{{ route('view-data.index') }}" class="form-inline mb-2 ml-auto">
+                            <div class="form-group mx-sm-3 mb-2" >
+                                <label for="sort">Sort by: </label>
+                                <select name="sort" id="sort" class="form-control d-inline-block w-auto">
+                                    <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>Created At</option>
+                                    <option value="datetime" {{ request('sort') == 'datetime' ? 'selected' : '' }}>Date Time</option>
+                                    <option value="pH" {{ request('sort') == 'pH' ? 'selected' : '' }}>pH</option>
+                                    <option value="cod" {{ request('sort') == 'cod' ? 'selected' : '' }}>COD</option>
+                                    <option value="tss" {{ request('sort') == 'tss' ? 'selected' : '' }}>TSS</option>
+                                    <option value="nh3n" {{ request('sort') == 'nh3n' ? 'selected' : '' }}>NH3N</option>
+                                    <option value="debit" {{ request('sort') == 'debit' ? 'selected' : '' }}>Debit</option>
+                                </select>
+                            </div>
                             
-                            <select name="order" id="order" class="form-control d-inline-block w-auto">
-                                <option value="asc" {{ request('order') == 'asc' ? 'selected' : '' }}>Ascending</option>
-                                <option value="desc" {{ request('order') == 'desc' ? 'selected' : '' }}>Descending</option>
-                            </select>
-
-                            <button type="submit" class="btn btn-primary">Sort</button>
+                            <div class="form-group mx-sm-3 mb-2">
+                                <select name="order" id="order" class="form-control d-inline-block w-auto">
+                                    <option value="asc" {{ request('order') == 'asc' ? 'selected' : '' }}>Ascending</option>
+                                    <option value="desc" {{ request('order') == 'desc' ? 'selected' : '' }}>Descending</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success mb-2">
+                                <i class="fas fa-sort"></i> Sort
+                            </button>
                         </form>
-
                     </div>
                     <div class="card-body">
                         <table class="table table-bordered table-hover">
