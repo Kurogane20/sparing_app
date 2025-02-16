@@ -7,7 +7,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ $title ?? "Reza Nurfachmi @ Laradminlte" }} | Dashboard</title>
+  <title>{{ config('app.name', 'Laravel') }}</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -15,6 +15,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <link rel="stylesheet" href="{{ asset('assets/plugins/fontawesome-free/css/all.min.css') }}">
   <!-- Theme style -->
   <link rel="stylesheet" href="{{ asset('assets/dist/css/adminlte.min.css') }}">
+  <link rel="icon" href="{{ asset('pngegg.png') }}" type="image/x-icon">
+  <script src="{{asset ('assets/plugins/chart.js/Chart.min.js')}}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.7"></script>
+  <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/laravel-echo/dist/echo.iife.js"></script>
+  {{-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script> --}}
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -40,7 +46,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
       <!-- Navbar Search -->
-      <li class="nav-item">
+      {{-- <li class="nav-item">
         <a class="nav-link" data-widget="navbar-search" href="#" role="button">
           <i class="fas fa-search"></i>
         </a>
@@ -59,92 +65,22 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </div>
           </form>
         </div>
-      </li>
+      </li> --}}
 
       <!-- Messages Dropdown Menu -->
-      <li class="nav-item dropdown">
-        <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="far fa-comments"></i>
-          <span class="badge badge-danger navbar-badge">3</span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <a href="#" class="dropdown-item">
-            <!-- Message Start -->
-            <div class="media">
-              <img src="{{ asset('assets/dist/img/user1-128x128.jpg') }}" alt="User Avatar" class="img-size-50 mr-3 img-circle">
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  Brad Diesel
-                  <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">Call me whenever you can...</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-              </div>
-            </div>
-            <!-- Message End -->
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <!-- Message Start -->
-            <div class="media">
-              <img src="{{ asset('assets/dist/img/user8-128x128.jpg') }}" alt="User Avatar" class="img-size-50 img-circle mr-3">
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  John Pierce
-                  <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">I got your message bro</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-              </div>
-            </div>
-            <!-- Message End -->
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <!-- Message Start -->
-            <div class="media">
-              <img src="{{ asset('assets/dist/img/user3-128x128.jpg') }}" alt="User Avatar" class="img-size-50 img-circle mr-3">
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  Nora Silvester
-                  <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">The subject goes here</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-              </div>
-            </div>
-            <!-- Message End -->
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
-        </div>
-      </li>
+      
       <!-- Notifications Dropdown Menu -->
       <li class="nav-item dropdown">
-        <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="far fa-bell"></i>
-          <span class="badge badge-warning navbar-badge">15</span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <span class="dropdown-header">15 Notifications</span>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-envelope mr-2"></i> 4 new messages
-            <span class="float-right text-muted text-sm">3 mins</span>
+          <a class="nav-link" id="notificationDropdown" href="#" data-toggle="dropdown">
+              <i class="far fa-bell"></i>
+              <span id="notificationBadge" class="badge badge-warning navbar-badge">0</span>
           </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-users mr-2"></i> 8 friend requests
-            <span class="float-right text-muted text-sm">12 hours</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-file mr-2"></i> 3 new reports
-            <span class="float-right text-muted text-sm">2 days</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-        </div>
+          <div id="notificationMenu" class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+              <span class="dropdown-header">0 Notifications</span>
+              <div id="notificationItems"></div>
+              <div class="dropdown-divider"></div>
+              <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+          </div>
       </li>
       <li class="nav-item">
         <a class="nav-link" data-widget="fullscreen" href="#" role="button">
@@ -160,23 +96,23 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Brand Logo -->
     <a href="{{ route('home') }}" class="brand-link">
       <img src="{{ asset('assets/dist/img/AdminLTELogo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">{{ $title ?? "Laradminlte" }}</span>
+      <span class="brand-text font-weight-light">{{ $title ?? "SPARING APP" }}</span>
     </a>
 
     <!-- Sidebar -->
     <div class="sidebar">
       <!-- Sidebar user panel (optional) -->
-      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-        <div class="image">
+      <div class="user-panel mt-1 pb-1 mb-1 d-flex">
+        {{-- <div class="image">
           <img src="{{ asset('assets/dist/img/user2-160x160.jpg') }}" class="img-circle elevation-2" alt="User Image">
-        </div>
+        </div> --}}
         <div class="info">
-          <a href="#" class="d-block">{{ auth()->user()->name }}</a>
+          <a href="#" class="d-block">Welcome, {{ auth()->user()->name }}</a>
         </div>
       </div>
 
       <!-- SidebarSearch Form -->
-      <div class="form-inline">
+      {{-- <div class="form-inline">
         <div class="input-group" data-widget="sidebar-search">
           <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
           <div class="input-group-append">
@@ -185,42 +121,47 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </button>
           </div>
         </div>
-      </div>
+      </div> --}}
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-          <li class="nav-item menu-open">
-            <a href="#" class="nav-link active">
+          <li class="nav-item ">
+            <a href="home" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
-                Starter Pages
-                <i class="right fas fa-angle-left"></i>
+                Dashboard                
+              </p>
+            </a>            
+          </li>
+          <li class="nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
+            <a href="{{ route('profile') }}" class="nav-link {{ request()->routeIs('profile') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-building"></i>
+              <p>
+                Data Perusahaan
+                {{-- <span class="right badge badge-danger">New</span> --}}
               </p>
             </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="#" class="nav-link active">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Active Page</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Inactive Page</p>
-                </a>
-              </li>
-            </ul>
           </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
+          @if (Auth::user()->role == 'admin')
+          <li class="nav-item {{ request()->routeIs('users.index') ? 'active' : '' }}">
+            <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.index') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-user"></i>
               <p>
-                Simple Link
-                <span class="right badge badge-danger">New</span>
+                User Management
+                {{-- <span class="right badge badge-danger">New</span> --}}
+              </p>
+            </a>
+          </li>
+          @endif
+          <li class="nav-item {{ request()->routeIs('view-data.index') ? 'active' : '' }}">
+            <a href="{{ route('view-data.index') }}" class="nav-link {{ request()->routeIs('view-data.index') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-print"></i>
+              <p>
+                Monitoring Data
+                {{-- <span class="right badge badge-danger">New</span> --}}
               </p>
             </a>
           </li>
@@ -233,7 +174,25 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
   @yield('content')
 
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <strong>Copyright &copy; 2025 <a href="#">Mitra Mutiara</a>.</strong>
+    All rights reserved.
+    <div class="float-right d-none d-sm-inline-block">
+      <b>Version</b> 1.0.0
+    </div>
+  </footer>
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
 <!-- REQUIRED SCRIPTS -->
+
 
 <!-- jQuery -->
 <script src="{{ asset('assets/plugins/jquery/jquery.min.js') }}"></script>
@@ -241,5 +200,64 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <script src="{{ asset('assets/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 <!-- AdminLTE App -->
 <script src="{{ asset('assets/dist/js/adminlte.min.js') }}"></script>
+{{-- <script src="{{ asset('assets/dist/js/demo.js') }}"></script> --}}
+<script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+<script>
+    const pusher = new Pusher('7f90a15862d5a61ba889', {
+        cluster: 'ap1',
+        encrypted: true,
+        forceTLS: true,
+
+    });
+
+    const channel = pusher.subscribe('data-channel');
+    console.log('Pusher initialized and channel subscribed');
+    const notificationBadge = document.getElementById('notificationBadge');
+    const notificationItems = document.getElementById('notificationItems');
+    const notificationHeader = document.querySelector('#notificationMenu .dropdown-header');
+
+    let notificationCount = 0;
+
+    channel.bind('data.exceeded', function(data) {
+      console.log('Event received:', data);
+      console.log('Data exceeded threshold:', data);
+        // Update notification count
+        notificationCount++;
+        notificationBadge.textContent = notificationCount;
+        notificationHeader.textContent = `${notificationCount} Notifications`;
+
+        // Create new notification item
+        const notificationItem = document.createElement('a');
+        notificationItem.href = '#';
+        notificationItem.className = 'dropdown-item';
+        notificationItem.innerHTML = `
+            <div class="media">
+                <div class="media-body">
+                    <h3 class="dropdown-item-title">
+                        Data Exceeded Threshold
+                        <span class="float-right text-sm text-danger"><i class="fas fa-exclamation-circle"></i></span>
+                    </h3>
+                    <p class="text-sm">${data.message}</p>
+                    <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> Just now</p>
+                </div>
+            </div>
+        `;
+
+        // Add the new notification to the top of the list
+        notificationItems.insertBefore(notificationItem, notificationItems.firstChild);
+
+        // Show alert (optional)
+        alert(data.message);
+    });
+
+    // Clear notifications when "See All Notifications" is clicked
+    document.querySelector('.dropdown-footer').addEventListener('click', function(e) {
+        e.preventDefault();
+        notificationCount = 0;
+        notificationBadge.textContent = '0';
+        notificationHeader.textContent = '0 Notifications';
+        notificationItems.innerHTML = ''; // Clear all notifications
+    });
+</script>
 </body>
 </html>
