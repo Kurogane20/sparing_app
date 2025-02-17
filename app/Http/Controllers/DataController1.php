@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Data;
-use App\Models\Uid;
+use App\Models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Validator;
@@ -32,15 +32,16 @@ class DataController extends Controller
             $decoded = JWT::decode($token, new Key($key, 'HS256'));
             $payload = json_decode(json_encode($decoded), true); // Convert ke array
 
-            // Validasi UID dari tabel uids
-            $uidRecord = Uid::where('uid', $payload['uid'])->first();
-            if (!$uidRecord) {
+
+            // Validasi UID
+            $user = User::where('uid', $payload['uid'])->first();
+            if (!$user) {
                 return response()->json(['message' => 'Invalid UID'], 401);
             }
 
             // Validasi data dengan Laravel Validator
             $validator = Validator::make($payload, [
-                'uid'   => 'required|string|exists:uids,uid',
+                'uid'   => 'required|string|exists:users,uid',
                 'data'  => 'required|array|min:1|max:30',
                 'data.*.datetime' => 'required|integer',
                 'data.*.pH'       => 'required|numeric|min:0|max:14',
@@ -72,6 +73,7 @@ class DataController extends Controller
             Data::insert($insertData); // Batch insert untuk efisiensi
 
             return response()->json(['message' => 'Data saved successfully'], 200);
+
         } catch (\UnexpectedValueException $e) {
             return response()->json(['message' => 'Invalid token format', 'error' => $e->getMessage()], 400);
         } catch (\Exception $e) {
@@ -101,7 +103,7 @@ class DataController extends Controller
 
     public function getRegisteredUids()
     {
-        $uids = Uid::pluck('uid');
+        $uids = User::whereNotNull('uid')->pluck('uid');
         return response()->json($uids);
     }
 }

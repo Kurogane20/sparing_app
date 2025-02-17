@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ViewDataController;
 use App\Http\Controllers\ProfileContoller;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\UidController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +30,7 @@ Route::get('/sse', [HomeController::class, 'sse'])->name('sse');
 Route::get('/api/latestData', [HomeController::class, 'getLatestData'])->name('api.latestData');
 
 Route::resource('users', UserController::class)->middleware(['auth', 'admin']);
+Route::resource('uids', UidController::class)->middleware('auth');
 
 Route::get('/view-data', [ViewDataController::class, 'index'])->middleware('auth')->name('view-data.index');
 Route::get('/api/data', [ViewDataController::class, 'getData'])->middleware(['auth'])->name('api.data');

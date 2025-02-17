@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Data;
-use App\Models\Uid;
 use App\Exports\DataExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Events\DataExceededThreshold;
 
 class ViewDataController extends Controller
 {
+    // Batas ambang (sesuaikan sesuai kebutuhan Anda)
     private $thresholds = [
         'pH' => ['min' => 6, 'max' => 9],
         'cod' => ['min' => 0, 'max' => 1000],
@@ -21,9 +22,13 @@ class ViewDataController extends Controller
 
     public function index(Request $request)
     {
-        $user = auth()->user();
-        $sort = $request->query('sort', 'created_at');
-        $order = $request->query('order', 'desc');
+         $user = auth()->user();
+    
+        // Ambil parameter sorting dari request
+        $sort = $request->query('sort', 'created_at'); // Default sorting berdasarkan 'created_at'
+        $order = $request->query('order', 'desc'); // Default descending
+
+        // Daftar kolom yang bisa digunakan untuk sorting
         $sortable = ['created_at', 'datetime', 'pH', 'cod', 'tss', 'nh3n', 'debit'];
 
         // Pastikan kolom yang digunakan valid
@@ -35,9 +40,7 @@ class ViewDataController extends Controller
         if ($user->role == 'admin') {
             $data = Data::orderBy($sort, $order)->paginate(10);
         } else {
-            // Ambil UID dari relasi
-            $uids = $user->uids->pluck('uid');
-            $data = Data::whereIn('uid', $uids)
+            $data = Data::where('uid', $user->uid)
                         ->orderBy($sort, $order)
                         ->paginate(10);
         }
@@ -55,11 +58,13 @@ class ViewDataController extends Controller
         $requestedUid = $request->input('uid');
 
         if ($user->role == 'admin') {
-            $data = $requestedUid ? Data::where('uid', $requestedUid)->get() : Data::all();
+            if ($requestedUid) {
+                $data = Data::where('uid', $requestedUid)->get();
+            } else {
+                $data = Data::all();
+            }
         } else {
-            $data = Data::whereIn('uid', function ($query) use ($user) {
-                $query->select('uid')->from('uids')->where('user_id', $user->id);
-            })->get();
+            $data = Data::where('uid', $user->uid)->get();
         }
 
         return response()->json($data);
@@ -71,13 +76,16 @@ class ViewDataController extends Controller
         $requestedUid = $request->input('uid');
 
         if ($user->role == 'admin') {
-            $data = $requestedUid ? Data::where('uid', $requestedUid)->get() : Data::all();
+            if ($requestedUid) {
+                $data = Data::where('uid', $requestedUid)->get();
+            } else {
+                $data = Data::all();
+            }
         } else {
-            $data = Data::whereIn('uid', function ($query) use ($user) {
-                $query->select('uid')->from('uids')->where('user_id', $user->id);
-            })->get();
+            $data = Data::where('uid', $user->uid)->get();
         }
 
+        // Statistik untuk pie chart
         $totalData = $data->count();
         $validData = 0;
         $invalidData = 0;
@@ -85,22 +93,39 @@ class ViewDataController extends Controller
         foreach ($data as $item) {
             $isValid = true;
             foreach ($this->thresholds as $key => $threshold) {
-                if (isset($item[$key]) && ($item[$key] < $threshold['min'] || $item[$key] > $threshold['max'])) {
-                    $isValid = false;
-                    if (!$item->notification_sent) {
-                        event(new DataExceededThreshold("Nilai $key melebihi batas."));
-                        $item->notification_sent = true;
-                        $item->save();
+                if (isset($item[$key])) {
+                    if ($item[$key] < $threshold['min'] || $item[$key] > $threshold['max'])
+                     {
+                        $isValid = false;
+
+                        // Periksa apakah notifikasi sudah dikirim
+                        if (!$item->notification_sent) {
+                            // Kirim event jika data melebihi ambang batas
+                            event(new DataExceededThreshold("Nilai $key melebihi batas yang ditentukan."));
+
+                            // Tandai notifikasi sudah dikirim
+                            $item->notification_sent = true;
+                            $item->save();
+                        }
+                        break;
                     }
-                    break;
                 }
             }
-            $isValid ? $validData++ : $invalidData++;
+            if ($isValid) {
+                $validData++;
+            } else {
+                $invalidData++;
+            }
         }
 
-        return response()->json(['stats' => ['total' => $totalData, 'valid' => $validData, 'invalid' => $invalidData]]);
+        return response()->json([
+            'stats' => [
+                'total' => $totalData,
+                'valid' => $validData,
+                'invalid' => $invalidData
+            ]
+        ]);
     }
-
     public function export(Request $request)
     {
         $user = auth()->user();
@@ -115,13 +140,13 @@ class ViewDataController extends Controller
         }
 
         if ($user->role != 'admin') {
-            $query->whereIn('uid', function ($query) use ($user) {
-                $query->select('uid')->from('uids')->where('user_id', $user->id);
-            });
+            $query->where('uid', $user->uid);
         } elseif ($requestedUid) {
             $query->where('uid', $requestedUid);
         }
 
-        return Excel::download(new DataExport($query->get()), 'data_export_' . now()->format('Ymd_His') . '.xlsx');
+        $data = $query->get();
+
+        return Excel::download(new DataExport($data), 'data_export_' . now()->format('Ymd_His') . '.xlsx');
     }
 }

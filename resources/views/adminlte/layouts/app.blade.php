@@ -145,6 +145,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </p>
             </a>
           </li>
+          <li class="nav-item {{ request()->routeIs('uids.index') ? 'active' : '' }}">
+            <a href="{{ route('uids.index') }}" class="nav-link {{ request()->routeIs('uids.index') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-database "></i>
+              <p>
+                Data Logger
+                {{-- <span class="right badge badge-danger">New</span> --}}
+              </p>
+            </a>
+          </li>
           @if (Auth::user()->role == 'admin')
           <li class="nav-item {{ request()->routeIs('users.index') ? 'active' : '' }}">
             <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.index') ? 'active' : '' }}">
