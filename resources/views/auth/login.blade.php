@@ -2,15 +2,16 @@
 
 @section('content')
 <body class="hold-transition login-page">
-    <div class="login-box">
-      <div class="login-logo">
-        <a href="{{ route('home') }}"><b>{{ config('app.name', 'Laravel') }}</b> 1.0</a>
-      </div>
+    <div class="login-box">      
       <!-- /.login-logo -->
-      <div class="card">
+      <div class="card card-primary card-outline">
+        <div class="card-header  ">
+          <div class="login-logo">
+            <img src="{{ asset('Logo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle" style="width: 30%; margin-bottom: -30px; margin-top: -30px">            
+          </div>
+        </div>
         <div class="card-body login-card-body">
           <p class="login-box-msg">Sign in to start your session</p>
-
           <form action="{{ route('login') }}" method="post">
             @csrf
             <div class="input-group mb-3">
