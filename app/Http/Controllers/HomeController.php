@@ -53,7 +53,7 @@ class HomeController extends Controller
         $uid = $request->query('uid');
 
         // Jika user bukan admin, pastikan UID yang diminta miliknya
-        if ($user->role != 'admin' && !$user->uids->where('uid', $uid)->exists()) {
+       if ($user->role != 'admin' && !$user->uids()->where('uid', $uid)->exists()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
