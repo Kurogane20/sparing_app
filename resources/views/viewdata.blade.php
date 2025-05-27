@@ -68,37 +68,39 @@
                         </form>
                     </div>
                     <div class="card-body">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th><a href="{{ route('view-data.index', ['sort' => 'uid', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}">UID</a></th>
-                                    <th><a href="{{ route('view-data.index', ['sort' => 'pH', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}">pH</a></th>
-                                    <th><a href="{{ route('view-data.index', ['sort' => 'cod', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}">COD</a></th>
-                                    <th><a href="{{ route('view-data.index', ['sort' => 'tss', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}">TSS</a></th>
-                                    <th><a href="{{ route('view-data.index', ['sort' => 'nh3n', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}">NH3N</a></th>
-                                    <th><a href="{{ route('view-data.index', ['sort' => 'debit', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}">Debit</a></th>
-                                    <th><a href="{{ route('view-data.index', ['sort' => 'datetime', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}">Date Time</a></th>
-                                    <th><a href="{{ route('view-data.index', ['sort' => 'created_at', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}">Date</a></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($data as $datas)
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
                                     <tr>
-                                        <td>{{ ($data->currentPage() - 1) * $data->perPage() + $loop->iteration }}</td>
-                                        <td>{{ $datas->uid }}</td>
-                                        <td>{{ $datas->pH }}</td>
-                                        <td>{{ $datas->cod }}</td>
-                                        <td>{{ $datas->tss }}</td>
-                                        <td>{{ $datas->nh3n }}</td>
-                                        <td>{{ $datas->debit }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($datas->datetime)->setTimezone('Asia/Jakarta')->translatedFormat('l, d F Y H:i') }}</td>
-                                        <td>{{ $datas->created_at }}</td>
+                                        <th>#</th>
+                                        <th><a href="{{ route('view-data.index', ['sort' => 'uid', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}">UID</a></th>
+                                        <th><a href="{{ route('view-data.index', ['sort' => 'pH', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}">pH</a></th>
+                                        <th><a href="{{ route('view-data.index', ['sort' => 'cod', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}">COD</a></th>
+                                        <th><a href="{{ route('view-data.index', ['sort' => 'tss', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}">TSS</a></th>
+                                        <th><a href="{{ route('view-data.index', ['sort' => 'nh3n', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}">NH3N</a></th>
+                                        <th><a href="{{ route('view-data.index', ['sort' => 'debit', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}">Debit</a></th>
+                                        <th><a href="{{ route('view-data.index', ['sort' => 'datetime', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}">Date Time</a></th>
+                                        <th><a href="{{ route('view-data.index', ['sort' => 'created_at', 'order' => request('order') == 'asc' ? 'desc' : 'asc']) }}">Date</a></th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                        {{ $data->appends(request()->query())->links('pagination::bootstrap-4') }}
+                                </thead>
+                                <tbody>
+                                    @foreach($data as $datas)
+                                        <tr>
+                                            <td>{{ ($data->currentPage() - 1) * $data->perPage() + $loop->iteration }}</td>
+                                            <td>{{ $datas->uid }}</td>
+                                            <td>{{ $datas->pH }}</td>
+                                            <td>{{ $datas->cod }}</td>
+                                            <td>{{ $datas->tss }}</td>
+                                            <td>{{ $datas->nh3n }}</td>
+                                            <td>{{ $datas->debit }}</td>
+                                            <td>{{ \Carbon\Carbon::createFromTimestamp($datas->datetime)->setTimezone('Asia/Jakarta')->translatedFormat('l, d F Y H:i') }}</td>
+                                            <td>{{ $datas->created_at }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                            {{ $data->appends(request()->query())->links('pagination::bootstrap-4') }}
+                        </div>                         
                     </div>
                 </div>
             </div>
