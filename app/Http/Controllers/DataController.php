@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Data;
+use App\Models\data;
 use App\Models\Uid;
 use App\Models\Log;
 use Firebase\JWT\JWT;
@@ -70,7 +70,7 @@ class DataController extends Controller
                     'updated_at' => now()
                 ];
             }
-            Data::insert($insertData); // Batch insert untuk efisiensi
+            data::insert($insertData); // Batch insert untuk efisiensi
 
             return response()->json(['message' => 'Data saved successfully'], 200);
         } catch (\UnexpectedValueException $e) {
@@ -159,7 +159,7 @@ class DataController extends Controller
 
     public function getData(Request $request)
     {
-        $data = Data::when($request->has('uid'), function ($query) use ($request) {
+        $data = data::when($request->has('uid'), function ($query) use ($request) {
             $query->where('uid', $request->query('uid'));
         })->get();
 
@@ -168,7 +168,7 @@ class DataController extends Controller
 
     public function getDataByUid($uid)
     {
-        $data = Data::where('uid', $uid)->get();
+        $data = data::where('uid', $uid)->get();
         return response()->json($data);
     }
 

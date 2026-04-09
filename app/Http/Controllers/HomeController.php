@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Data;
+use App\Models\data;
 use Illuminate\Http\Request;
 use App\Models\Uid;
 
@@ -49,11 +49,11 @@ class HomeController extends Controller
 
         // Data dashboard
         $latestData = $selectUid
-            ? Data::where('uid', $selectUid)->orderBy('datetime', 'desc')->first()
+            ? data::where('uid', $selectUid)->orderBy('datetime', 'desc')->first()
             : null;
 
         $recentData = $selectUid
-            ? Data::where('uid', $selectUid)->orderBy('datetime', 'desc')->take(10)->get()
+            ? data::where('uid', $selectUid)->orderBy('datetime', 'desc')->take(10)->get()
             : collect();
 
         // Map uid ↔ lokasi ↔ tipe_data untuk JS client
