@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\data;
 use App\Models\Uid;
-use App\Models\Log;
+use App\Models\LogEntry;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Validator;
@@ -116,7 +116,7 @@ class DataController extends Controller
             ], 422);
         }
 
-        Log::create([
+        LogEntry::create([
             'uid'       => $request->uid,
             'level'     => strtoupper($request->input('level', 'INFO')),
             'message'   => $request->message,
@@ -127,27 +127,34 @@ class DataController extends Controller
     }
 
     /**
-     * GET /api/logs?uid=xxx&limit=50
+     * GET /api/logs?uid=xxx&limit=50&after_id=0
      * Ambil log terbaru untuk uid tertentu (digunakan dashboard polling).
      */
     public function getLogs(Request $request)
     {
-        $uid    = $request->query('uid');
-        $limit  = min((int) $request->query('limit', 50), 200);
+        $uid     = $request->query('uid');
+        $limit   = min((int) $request->query('limit', 50), 200);
         $afterId = (int) $request->query('after_id', 0);
 
-        $query = Log::where('uid', $uid)->orderBy('id', 'asc');
-
-        if ($afterId > 0) {
-            $query->where('id', '>', $afterId);
-        } else {
-            // Ambil $limit log terbaru saat pertama load
-            $query = Log::where('uid', $uid)
-                ->orderBy('id', 'desc')
-                ->limit($limit);
+        if (!$uid) {
+            return response()->json([]);
         }
 
-        $logs = $query->get(['id', 'level', 'message', 'logged_at']);
+        if ($afterId > 0) {
+            // Polling: hanya ambil log baru setelah after_id
+            $logs = LogEntry::where('uid', $uid)
+                ->where('id', '>', $afterId)
+                ->orderBy('id', 'asc')
+                ->get(['id', 'level', 'message', 'logged_at']);
+        } else {
+            // Load pertama: ambil N log terbaru, dikembalikan asc (tertua di atas)
+            $logs = LogEntry::where('uid', $uid)
+                ->orderBy('id', 'desc')
+                ->limit($limit)
+                ->get(['id', 'level', 'message', 'logged_at'])
+                ->reverse()
+                ->values();
+        }
 
         return response()->json($logs);
     }

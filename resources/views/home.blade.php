@@ -721,30 +721,34 @@
             container.scrollTop = container.scrollHeight;
         }
 
+        const API_BASE = '{{ rtrim(config("app.url"), "/") }}/api';
+
         function fetchLogs() {
             if (paused) return;
 
-            const url = `/api/logs?uid=${uid}&after_id=${lastId}`;
-            fetch(url)
-                .then(r => r.json())
+            fetch(`${API_BASE}/logs?uid=${uid}&after_id=${lastId}`)
+                .then(r => {
+                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                    return r.json();
+                })
                 .then(logs => {
                     if (!Array.isArray(logs) || logs.length === 0) return;
-
                     emptyMsg.style.display = 'none';
-
                     logs.forEach(log => {
                         appendLog(log);
                         if (log.id > lastId) lastId = log.id;
                     });
-
                     scrollBottom();
                 })
-                .catch(() => {});
+                .catch(err => console.warn('Log fetch error:', err));
         }
 
         // Load pertama — ambil 50 log terakhir
-        fetch(`/api/logs?uid=${uid}&limit=50`)
-            .then(r => r.json())
+        fetch(`${API_BASE}/logs?uid=${uid}&limit=50`)
+            .then(r => {
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                return r.json();
+            })
             .then(logs => {
                 if (!Array.isArray(logs) || logs.length === 0) return;
                 emptyMsg.style.display = 'none';
@@ -753,7 +757,8 @@
                     if (log.id > lastId) lastId = log.id;
                 });
                 scrollBottom();
-            });
+            })
+            .catch(err => console.warn('Log initial load error:', err));
 
         // Polling setiap 3 detik untuk log baru
         interval = setInterval(fetchLogs, 3000);
