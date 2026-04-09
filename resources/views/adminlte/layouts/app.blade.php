@@ -9,12 +9,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SPARING APP</title>
 
-  <!-- Google Font: Source Sans Pro -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Google Font: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="{{ asset('assets/plugins/fontawesome-free/css/all.min.css') }}">
   <!-- Theme style -->
   <link rel="stylesheet" href="{{ asset('assets/dist/css/adminlte.min.css') }}">
+  <!-- Modern UI overrides -->
+  <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <link rel="icon" href="{{ asset('Logo.png') }}" type="image/x-icon">
   <script src="{{asset ('assets/plugins/chart.js/Chart.min.js')}}"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.7"></script>
@@ -33,10 +39,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="{{ route('home') }}" class="nav-link">Home</a>
+        <a href="{{ route('home') }}" class="nav-link"><i class="fas fa-home mr-1"></i> Home</a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="nav-link">Logout</a>
+        <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="nav-link" style="color:#ef4444!important">
+          <i class="fas fa-sign-out-alt mr-1"></i> Logout
+        </a>
         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
             @csrf
         </form>
@@ -102,12 +110,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Sidebar -->
     <div class="sidebar">
       <!-- Sidebar user panel (optional) -->
-      <div class="user-panel mt-1 pb-1 mb-1 d-flex">
-        {{-- <div class="image">
-          <img src="{{ asset('assets/dist/img/user2-160x160.jpg') }}" class="img-circle elevation-2" alt="User Image">
-        </div> --}}
-        <div class="info">
-          <a href="#" class="d-block">Welcome, {{ auth()->user()->name }}</a>
+      <div class="user-panel mt-1 pb-1 mb-1 d-flex align-items-center">
+        <div class="image">
+          <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#4f46e5,#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;color:#fff;letter-spacing:0.5px;">
+            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+          </div>
+        </div>
+        <div class="info ml-2">
+          <a href="#" class="d-block" style="font-size:0.82rem;font-weight:600;color:#e2e8f0!important;">{{ auth()->user()->name }}</a>
+          <span style="font-size:0.72rem;color:#64748b;">{{ ucfirst(auth()->user()->role) }}</span>
         </div>
       </div>
 
@@ -185,7 +196,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
   <!-- /.content-wrapper -->
   <footer class="main-footer">
-    <strong>Copyright &copy; 2025 <a href="#">Mitra Mutiara</a>.</strong>
+    <strong>Copyright &copy; 2026 <a href="#">SPARING v1.0</a>.</strong>
     All rights reserved.
     <div class="float-right d-none d-sm-inline-block">
       <b>Version</b> 1.0.0
@@ -210,6 +221,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <!-- AdminLTE App -->
 <script src="{{ asset('assets/dist/js/adminlte.min.js') }}"></script>
 {{-- <script src="{{ asset('assets/dist/js/demo.js') }}"></script> --}}
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
 <script>
     const pusher = new Pusher('7f90a15862d5a61ba889', {
@@ -255,8 +268,44 @@ scratch. This page gets rid of all links and provides the needed markup only.
         // Add the new notification to the top of the list
         notificationItems.insertBefore(notificationItem, notificationItems.firstChild);
 
-        // Show alert (optional)
-        alert(data.message);
+        // Modern popup alert
+        Swal.fire({
+            title: '<span style="font-family:Poppins,sans-serif;font-size:1.1rem;font-weight:700;color:#1e293b;">Peringatan Baku Mutu!</span>',
+            html: `
+                <div style="font-family:Poppins,sans-serif;">
+                    <div style="display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+                        <div style="background:#fef2f2;border-radius:50%;width:52px;height:52px;display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-exclamation-triangle" style="color:#ef4444;font-size:1.4rem;"></i>
+                        </div>
+                    </div>
+                    <p style="color:#475569;font-size:0.9rem;margin:0;line-height:1.6;">${data.message}</p>
+                    <div style="margin-top:12px;padding:10px 14px;background:#fef2f2;border-radius:8px;border-left:3px solid #ef4444;">
+                        <p style="color:#b91c1c;font-size:0.78rem;margin:0;font-weight:500;">
+                            <i class="fas fa-clock mr-1"></i> ${new Date().toLocaleString('id-ID', {hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+                        </p>
+                    </div>
+                </div>
+            `,
+            icon: false,
+            showConfirmButton: true,
+            confirmButtonText: '<i class="fas fa-check mr-1"></i> Mengerti',
+            confirmButtonColor: '#4f46e5',
+            showCloseButton: true,
+            timer: 15000,
+            timerProgressBar: true,
+            toast: false,
+            position: 'center',
+            customClass: {
+                popup: 'swal-custom-popup',
+                confirmButton: 'swal-confirm-btn',
+            },
+            didOpen: (popup) => {
+                popup.style.fontFamily = 'Poppins, sans-serif';
+                popup.style.borderRadius = '16px';
+                popup.style.padding = '24px';
+                popup.style.boxShadow = '0 20px 60px rgba(0,0,0,0.18)';
+            }
+        });
     });
 
     // Clear notifications when "See All Notifications" is clicked

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Uid extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id', 'uid', 'lokasi'];
+    protected $fillable = ['user_id', 'uid', 'lokasi', 'tipe_data'];
 
     public function user()
     {

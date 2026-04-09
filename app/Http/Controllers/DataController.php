@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Data;
 use App\Models\Uid;
+use App\Models\Log;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Validator;
@@ -77,6 +78,78 @@ class DataController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error processing request', 'error' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * POST /api/log
+     * Terima log text dari logger.
+     *
+     * Body (JSON):
+     * {
+     *   "uid":     "ABC123",       // wajib — harus terdaftar di tabel uids
+     *   "key":     "sparing",      // wajib — API key
+     *   "level":   "INFO",         // opsional: INFO | WARNING | ERROR | DEBUG
+     *   "message": "[SIM] ...",    // wajib — isi pesan log
+     *   "logged_at": "2025-04-09 05:32:00"  // opsional — default: waktu server
+     * }
+     */
+    public function postLog(Request $request)
+    {
+        $apiKey = config('app.logger_key', 'sparing');
+
+        // Validasi API key
+        if ($request->input('key') !== $apiKey) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'uid'       => 'required|string|exists:uids,uid',
+            'message'   => 'required|string',
+            'level'     => 'nullable|string|in:INFO,WARNING,ERROR,DEBUG',
+            'logged_at' => 'nullable|date',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validasi gagal',
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+
+        Log::create([
+            'uid'       => $request->uid,
+            'level'     => strtoupper($request->input('level', 'INFO')),
+            'message'   => $request->message,
+            'logged_at' => $request->input('logged_at', now()),
+        ]);
+
+        return response()->json(['message' => 'Log saved'], 200);
+    }
+
+    /**
+     * GET /api/logs?uid=xxx&limit=50
+     * Ambil log terbaru untuk uid tertentu (digunakan dashboard polling).
+     */
+    public function getLogs(Request $request)
+    {
+        $uid    = $request->query('uid');
+        $limit  = min((int) $request->query('limit', 50), 200);
+        $afterId = (int) $request->query('after_id', 0);
+
+        $query = Log::where('uid', $uid)->orderBy('id', 'asc');
+
+        if ($afterId > 0) {
+            $query->where('id', '>', $afterId);
+        } else {
+            // Ambil $limit log terbaru saat pertama load
+            $query = Log::where('uid', $uid)
+                ->orderBy('id', 'desc')
+                ->limit($limit);
+        }
+
+        $logs = $query->get(['id', 'level', 'message', 'logged_at']);
+
+        return response()->json($logs);
     }
 
     public function testConnection(Request $request)

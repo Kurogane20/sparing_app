@@ -24,6 +24,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('/get-key', [DataController::class, 'getKey']);
 Route::post('/post-data', [DataController::class, 'postData']);
+Route::post('/log', [DataController::class, 'postLog']);       // Terima log dari logger
+Route::get('/logs', [DataController::class, 'getLogs']);       // Ambil log terbaru (polling dashboard)
 
 
 Route::post('register', [AuthController::class, 'register']);

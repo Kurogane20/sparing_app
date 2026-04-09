@@ -14,7 +14,7 @@ class ViewDataController extends Controller
     private $thresholds = [
         'pH' => ['min' => 6, 'max' => 9],
         'cod' => ['min' => 0, 'max' => 1000],
-        'tss' => ['min' => 0, 'max' => 300],
+        'tss' => ['min' => 0, 'max' => 70],
         'nh3n' => ['min' => 0, 'max' => 1000],
         'debit' => ['min' => 0, 'max' => 500]
     ];

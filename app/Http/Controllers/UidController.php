@@ -41,14 +41,16 @@ class UidController extends Controller
         $this->authorize('isAdmin');
 
         $request->validate([
-            'uid' => 'required|string',
-            'lokasi' => 'required|string'
+            'uid'       => 'required|string',
+            'lokasi'    => 'required|string',
+            'tipe_data' => 'required|in:internal,klhk',
         ]);
 
         Uid::create([
-            'uid' => $request->uid,
-            'user_id' => $request->user_id,
-            'lokasi' => $request->lokasi
+            'uid'       => $request->uid,
+            'user_id'   => $request->user_id,
+            'lokasi'    => $request->lokasi,
+            'tipe_data' => $request->tipe_data,
         ]);
 
         return redirect()->route('uids.index')->with('success', 'UID berhasil ditambahkan.');
@@ -67,14 +69,16 @@ class UidController extends Controller
         $this->authorize('isAdmin');
 
         $request->validate([
-            'uid' => 'required|string',
-            'lokasi' => 'required|string'
+            'uid'       => 'required|string',
+            'lokasi'    => 'required|string',
+            'tipe_data' => 'required|in:internal,klhk',
         ]);
 
         $uid = Uid::findOrFail($id);
         $uid->update([
-            'uid' => $request->uid,
-            'lokasi' => $request->lokasi
+            'uid'       => $request->uid,
+            'lokasi'    => $request->lokasi,
+            'tipe_data' => $request->tipe_data,
         ]);
 
         return redirect()->route('uids.index')->with('success', 'UID berhasil diperbarui.');
