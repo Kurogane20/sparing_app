@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Data;
+use App\Models\data;
 use App\Models\Uid;
 use App\Exports\DataExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -33,11 +33,11 @@ class ViewDataController extends Controller
 
         // Query data sesuai dengan role user
         if ($user->role == 'admin') {
-            $data = Data::orderBy($sort, $order)->paginate(10);
+            $data = data::orderBy($sort, $order)->paginate(10);
         } else {
             // Ambil UID dari relasi
             $uids = $user->uids->pluck('uid');
-            $data = Data::whereIn('uid', $uids)
+            $data = data::whereIn('uid', $uids)
                         ->orderBy($sort, $order)
                         ->paginate(10);
         }
@@ -55,9 +55,9 @@ class ViewDataController extends Controller
         $requestedUid = $request->input('uid');
 
         if ($user->role == 'admin') {
-            $data = $requestedUid ? Data::where('uid', $requestedUid)->get() : Data::all();
+            $data = $requestedUid ? data::where('uid', $requestedUid)->get() : data::all();
         } else {
-            $data = Data::whereIn('uid', function ($query) use ($user) {
+            $data = data::whereIn('uid', function ($query) use ($user) {
                 $query->select('uid')->from('uids')->where('user_id', $user->id);
             })->get();
         }
@@ -71,9 +71,9 @@ class ViewDataController extends Controller
         $requestedUid = $request->input('uid');
 
         if ($user->role == 'admin') {
-            $data = $requestedUid ? Data::where('uid', $requestedUid)->get() : Data::all();
+            $data = $requestedUid ? data::where('uid', $requestedUid)->get() : data::all();
         } else {
-            $data = Data::whereIn('uid', function ($query) use ($user) {
+            $data = data::whereIn('uid', function ($query) use ($user) {
                 $query->select('uid')->from('uids')->where('user_id', $user->id);
             })->get();
         }
@@ -108,7 +108,7 @@ class ViewDataController extends Controller
         $endDate = $request->input('end_date');
         $requestedUid = $request->input('uid');
 
-        $query = Data::query();
+        $query = data::query();
 
         if ($startDate && $endDate) {
             $query->whereBetween('created_at', [$startDate, $endDate]);
