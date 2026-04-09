@@ -140,23 +140,25 @@ class DataController extends Controller
             return response()->json([]);
         }
 
-        if ($afterId > 0) {
-            // Polling: hanya ambil log baru setelah after_id
-            $logs = LogEntry::where('uid', $uid)
-                ->where('id', '>', $afterId)
-                ->orderBy('id', 'asc')
-                ->get(['id', 'level', 'message', 'logged_at']);
-        } else {
-            // Load pertama: ambil N log terbaru, dikembalikan asc (tertua di atas)
-            $logs = LogEntry::where('uid', $uid)
-                ->orderBy('id', 'desc')
-                ->limit($limit)
-                ->get(['id', 'level', 'message', 'logged_at'])
-                ->reverse()
-                ->values();
-        }
+        try {
+            if ($afterId > 0) {
+                $logs = LogEntry::where('uid', $uid)
+                    ->where('id', '>', $afterId)
+                    ->orderBy('id', 'asc')
+                    ->get(['id', 'level', 'message', 'logged_at']);
+            } else {
+                $logs = LogEntry::where('uid', $uid)
+                    ->orderBy('id', 'desc')
+                    ->limit($limit)
+                    ->get(['id', 'level', 'message', 'logged_at'])
+                    ->reverse()
+                    ->values();
+            }
 
-        return response()->json($logs);
+            return response()->json($logs);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function testConnection(Request $request)

@@ -727,14 +727,12 @@
             if (paused) return;
 
             fetch(`${API_BASE}/logs?uid=${uid}&after_id=${lastId}`)
-                .then(r => {
-                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-                    return r.json();
-                })
-                .then(logs => {
-                    if (!Array.isArray(logs) || logs.length === 0) return;
+                .then(r => r.json().then(body => ({ ok: r.ok, status: r.status, body })))
+                .then(({ ok, status, body }) => {
+                    if (!ok) { console.warn('getLogs error:', status, body); return; }
+                    if (!Array.isArray(body) || body.length === 0) return;
                     emptyMsg.style.display = 'none';
-                    logs.forEach(log => {
+                    body.forEach(log => {
                         appendLog(log);
                         if (log.id > lastId) lastId = log.id;
                     });
