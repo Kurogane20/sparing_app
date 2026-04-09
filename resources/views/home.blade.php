@@ -721,7 +721,7 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        const API_BASE = '{{ rtrim(config("app.url"), "/") }}/api';
+        const API_BASE = window.location.origin + '/api';
 
         function fetchLogs() {
             if (paused) return;
