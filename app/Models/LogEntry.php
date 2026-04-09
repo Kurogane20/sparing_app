@@ -9,6 +9,7 @@ class LogEntry extends Model
 {
     use HasFactory;
 
+    protected $table    = 'logs';
     protected $fillable = ['uid', 'level', 'message', 'logged_at'];
 
     protected $casts = [
